@@ -39,8 +39,9 @@ const getCssLoaders = (importLoaders) => [
 
 module.exports = {
   mode: isDev ? 'development' : 'production',
+  devtool: isDev ? 'eval-source-map' : 'none',
   entry: {
-    app: resolve(__dirname, './app.js'),
+    app: resolve(__dirname, './src/index.tsx'),
   },
   output: {
     filename: isDev ? 'js/[name].js' : 'js/[name].[hash:8].js',
@@ -76,38 +77,72 @@ module.exports = {
             useShortDoctype: true,
           },
     }),
-    // new CleanWebpackPlugin(),
+    new CleanWebpackPlugin(),
   ],
-  // module: {
-  //   rules: [
-  //     {
-  //       test: /\.css$/,
-  //       use: getCssLoaders(1),
-  //     },
-  //     {
-  //       test: /\.less$/,
-  //       use: [
-  //         ...getCssLoaders(2),
-  //         {
-  //           loader: 'less-loader',
-  //           options: {
-  //             sourceMap: isDev,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       test: /\.scss$/,
-  //       use: [
-  //         ...getCssLoaders(2),
-  //         {
-  //           loader: 'sass-loader',
-  //           options: {
-  //             sourceMap: isDev,
-  //           },
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: getCssLoaders(1),
+      },
+      {
+        test: /\.less$/,
+        use: [
+          ...getCssLoaders(2),
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: isDev,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          ...getCssLoaders(2),
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: isDev,
+            },
+          },
+        ],
+      },
+      {
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 10 * 1024,
+              name: '[name].[contenthash:8].[ext]',
+              outputPath: 'assets/images',
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(ttf|woff|woff2|eot|otf)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[contenthash:8].[ext]',
+              outputPath: 'assets/fonts',
+            },
+          },
+        ],
+      },
+      {
+        test: /\.(tsx?|js)$/,
+        loader: 'babel-loader',
+        options: { cacheDirectory: true },
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.json'],
+  },
 };
